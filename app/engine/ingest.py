@@ -2,7 +2,7 @@ import json
 import os
 import shutil
 from langchain_core.documents import Document
-from langchain_openai import OpenAIEmbeddings
+from langchain_nomic import NomicEmbeddings
 from langchain_chroma import Chroma
 from dotenv import load_dotenv
 
@@ -66,7 +66,7 @@ def ingest_to_chroma(docs):
     if os.path.exists(CHROMA_PATH):
         shutil.rmtree(CHROMA_PATH) 
 
-    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+    embeddings = NomicEmbeddings(model="nomic-embed-text-v1.5")
     
     print(f"Creating Chroma database at {CHROMA_PATH}...")
     

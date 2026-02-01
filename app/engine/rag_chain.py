@@ -1,6 +1,6 @@
 import os
 from langchain_chroma import Chroma
-from langchain_openai import OpenAIEmbeddings
+from langchain_nomic import NomicEmbeddings
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -14,7 +14,7 @@ COLLECTION_NAME = os.getenv("COLLECTION_NAME", "justify_legal_docs")
 
 def get_retriever():
     """Loads the existing Chroma DB from disk."""
-    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+    embeddings = NomicEmbeddings(model="nomic-embed-text-v1.5")
     
     vectorstore = Chroma(
         persist_directory=CHROMA_PATH,
