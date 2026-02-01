@@ -26,12 +26,23 @@ def get_retriever():
     return vectorstore.as_retriever(search_kwargs={"k": 4})
 
 def format_docs(docs):
-    """Formats retrieved law chunks into a single string for the prompt."""
+    """Formats retrieved Constitution articles into a single string for the prompt."""
     formatted_chunks = []
     for doc in docs:
-        source = doc.metadata.get('source', 'Unknown Act')
-        section = doc.metadata.get('section', 'Unknown Section')
-        formatted_chunks.append(f"SOURCE: {source} ({section})\nTEXT: {doc.page_content}")
+        source = doc.metadata.get('source', 'Unknown Law')
+        section = doc.metadata.get('section', 'Unknown Article')
+        article_name = doc.metadata.get('article_name', '')
+        part = doc.metadata.get('part', '')
+        
+        # Build header with all available metadata
+        header = f"SOURCE: {source}\n"
+        if part:
+            header += f"PART: {part}\n"
+        header += f"ARTICLE: {section}"
+        if article_name:
+            header += f" - {article_name}"
+        
+        formatted_chunks.append(f"{header}\n\nTEXT:\n{doc.page_content}")
     
     return "\n\n---\n\n".join(formatted_chunks)
 
@@ -45,16 +56,18 @@ def build_rag_chain():
         max_tokens=1024
     )
 
-    system_prompt = """You are 'Justify', a legal AI assistant for Bangladesh.
+    system_prompt = """You are 'Justify', a legal AI assistant for Bangladesh specializing in Constitutional law.
     
-    Use the following pieces of retrieved legal context to answer the user's question.
+    Use the following pieces of retrieved legal context from the Constitution of Bangladesh to answer the user's question.
     
     GUIDELINES:
     1. STRICTLY base your answer on the provided context. Do not use outside knowledge.
-    2. If the answer is not in the context, say: "I cannot find a specific law in my database regarding this."
-    3. CITE YOUR SOURCES. Mention the Act Name and Section Number for every claim.
-    4. Format your answer in Markdown. Use bullet points for clarity.
-    5. Be concise but accurate.
+    2. If the answer is not in the context, say: "I cannot find specific information in the Constitution regarding this."
+    3. CITE YOUR SOURCES. Always mention the Article Number and name for every claim (e.g., "Article 27 - Equality before law").
+    4. When relevant, mention which Part of the Constitution the article belongs to.
+    5. Format your answer in Markdown. Use bullet points for clarity.
+    6. Be concise but accurate. Use accessible language for non-lawyers.
+    7. If both English and Bengali text are provided, prioritize English but acknowledge the Bengali version exists.
 
     CONTEXT:
     {context}
