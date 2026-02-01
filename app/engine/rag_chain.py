@@ -1,7 +1,7 @@
 import os
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
-from langchain_anthropic import ChatAnthropic
+from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
@@ -49,9 +49,9 @@ def format_docs(docs):
 def build_rag_chain():
     retriever = get_retriever()
     
-    # Using Claude 3.5 Sonnet for high reasoning capability
-    llm = ChatAnthropic(
-        model="claude-3-5-sonnet-20240620", 
+    # Using Groq's Llama 3.1 70B for fast and accurate reasoning
+    llm = ChatGroq(
+        model="llama-3.1-70b-versatile",
         temperature=0,
         max_tokens=1024
     )
